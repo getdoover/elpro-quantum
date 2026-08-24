@@ -1,0 +1,1059 @@
+{
+    "elpro_quantum_diagnostics": {
+        "name": "elpro_quantum_diagnostics",
+        "display_name": "ELPRO Quantum Diagnostics",
+        "type": "DEV",
+        "visibility": "PUB",
+        "allow_many": false,
+        "description": "Radio, charger/MPPT and power-rail diagnostics for an ELPRO Quantum.",
+        "long_description": "README.md",
+        "depends_on": [],
+        "organisation_id": null,
+        "image_name": "registry.doover.com/apps/elpro_quantum_diagnostics:main",
+        "build_args": "--platform linux/amd64,linux/arm64",
+        "config_schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "",
+            "title": "$default",
+            "type": "object",
+            "properties": {
+                "poll_interval_s": {
+                    "title": "Poll Interval (s)",
+                    "x-name": "poll_interval_s",
+                    "x-hidden": false,
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "How often to re-read the unit. The radio's counters move slowly and each read costs a transaction on the radio's internal link, so there is little to gain below about 10 seconds.",
+                    "default": 30.0,
+                    "x-position": 0,
+                    "minimum": 5.0
+                },
+                "read_radio": {
+                    "title": "Read Radio",
+                    "x-name": "read_radio",
+                    "x-hidden": false,
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Read the licensed-band radio's diagnostics from sysfs. Requires the app to run on the Quantum itself with host networking, which is how Doover deploys apps by default.",
+                    "default": true,
+                    "x-position": 1
+                },
+                "radio_device": {
+                    "title": "Radio Device",
+                    "x-name": "radio_device",
+                    "x-hidden": false,
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Which radio to read, e.g. 'phy1', or a full sysfs path. Leave blank to auto-detect, which is correct unless the unit has more than one radio module fitted.",
+                    "default": null,
+                    "x-position": 2
+                },
+                "read_charger__mppt": {
+                    "title": "Read Charger / MPPT",
+                    "x-name": "read_charger__mppt",
+                    "x-hidden": false,
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Read the BQ25756 solar charge controller from sysfs.",
+                    "default": true,
+                    "x-position": 3
+                },
+                "read_unit_configuration": {
+                    "title": "Read Unit Configuration",
+                    "x-name": "read_unit_configuration",
+                    "x-hidden": false,
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Read the MPPT and charger settings, and the unit's identity, from the Quantum's own configuration daemon on localhost. Read-only.",
+                    "default": true,
+                    "x-position": 4
+                },
+                "configuration_server": {
+                    "title": "Configuration Server",
+                    "x-name": "configuration_server",
+                    "x-hidden": false,
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Address of the unit's configuration daemon.",
+                    "default": "127.0.0.1",
+                    "x-position": 5
+                },
+                "configuration_server_port": {
+                    "title": "Configuration Server Port",
+                    "x-name": "configuration_server_port",
+                    "x-hidden": false,
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "TCP port of the unit's configuration daemon.",
+                    "default": 4783,
+                    "x-position": 6,
+                    "minimum": 1,
+                    "maximum": 65535
+                },
+                "read_supply_and_battery_rails": {
+                    "title": "Read Supply and Battery Rails",
+                    "x-name": "read_supply_and_battery_rails",
+                    "x-hidden": false,
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Read the supply and battery voltages and currents over the unit's Modbus TCP server. The server is off on a factory Quantum and has to be enabled in the web config before this will report anything.",
+                    "default": true,
+                    "x-position": 7
+                },
+                "modbus_server": {
+                    "title": "Modbus Server",
+                    "x-name": "modbus_server",
+                    "x-hidden": false,
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Address of the Quantum's Modbus TCP server.",
+                    "default": "127.0.0.1",
+                    "x-position": 8
+                },
+                "modbus_server_port": {
+                    "title": "Modbus Server Port",
+                    "x-name": "modbus_server_port",
+                    "x-hidden": false,
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "TCP port of the Quantum's Modbus TCP server.",
+                    "default": 502,
+                    "x-position": 9,
+                    "minimum": 1,
+                    "maximum": 65535
+                },
+                "weak_signal_threshold_dbm": {
+                    "title": "Weak Signal Threshold (dBm)",
+                    "x-name": "weak_signal_threshold_dbm",
+                    "x-hidden": false,
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Raise a warning when the last received packet was weaker than this. -100 dBm leaves useful margin on a 12.5 kHz channel; lower it on a link that is known to run close to the noise floor.",
+                    "default": -100.0,
+                    "x-position": 10
+                },
+                "dv_app_position": {
+                    "title": "Position",
+                    "x-name": "dv_app_position",
+                    "x-hidden": true,
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "x-required": false,
+                    "description": "Position of Application in UI Structure. Smaller numbers are closer to the top.",
+                    "default": 100,
+                    "x-position": 11,
+                    "minimum": 0
+                }
+            },
+            "additionalElements": true,
+            "required": []
+        },
+        "ui_schema": {
+            "displayString": "$config.app().APP_DISPLAY_NAME",
+            "hidden": "$config.app().interpreter_hidden:boolean:false",
+            "fullWidth": "$config.app().interpreter_full_width:boolean:false",
+            "position": "$config.app().dv_app_position:number:100",
+            "icon": null,
+            "colour": null,
+            "defaultOpen": "$config.app().dv_app_default_open:boolean",
+            "type": "uiApplication",
+            "name": "$config.app().APP_KEY",
+            "children": {
+                "signal_last_packet": {
+                    "name": "signal_last_packet",
+                    "type": "uiVariable",
+                    "displayString": "Signal (last packet)",
+                    "showActivity": true,
+                    "position": 51,
+                    "hidden": false,
+                    "units": "dBm",
+                    "varType": "float",
+                    "currentValue": "$tag.app().rssi_last_dbm:number:null",
+                    "decPrecision": 0,
+                    "ranges": [
+                        {
+                            "min": -120,
+                            "max": -110,
+                            "colour": "red",
+                            "show_on_graph": true,
+                            "label": "Poor"
+                        },
+                        {
+                            "min": -110,
+                            "max": -100,
+                            "colour": "yellow",
+                            "show_on_graph": true,
+                            "label": "Fair"
+                        },
+                        {
+                            "min": -100,
+                            "max": -40,
+                            "colour": "green",
+                            "show_on_graph": true,
+                            "label": "Good"
+                        }
+                    ],
+                    "live": true
+                },
+                "signal_margin": {
+                    "name": "signal_margin",
+                    "type": "uiVariable",
+                    "displayString": "Signal Margin",
+                    "showActivity": true,
+                    "position": 52,
+                    "hidden": false,
+                    "units": "dB",
+                    "varType": "float",
+                    "currentValue": "$tag.app().snr_db:number:null",
+                    "decPrecision": 0,
+                    "live": true
+                },
+                "radio_state": {
+                    "name": "radio_state",
+                    "type": "uiVariable",
+                    "displayString": "Radio State",
+                    "showActivity": true,
+                    "position": 53,
+                    "hidden": false,
+                    "varType": "string",
+                    "currentValue": "$tag.app().radio_state:string:null"
+                },
+                "transmit_success": {
+                    "name": "transmit_success",
+                    "type": "uiVariable",
+                    "displayString": "Transmit Success",
+                    "showActivity": true,
+                    "position": 54,
+                    "hidden": false,
+                    "units": "%",
+                    "varType": "float",
+                    "currentValue": "$tag.app().tx_success_pct:number:null",
+                    "decPrecision": 1
+                },
+                "supply": {
+                    "name": "supply",
+                    "type": "uiVariable",
+                    "displayString": "Supply",
+                    "showActivity": true,
+                    "position": 55,
+                    "hidden": false,
+                    "units": "V",
+                    "varType": "float",
+                    "currentValue": "$tag.app().supply_voltage_v:number:null",
+                    "decPrecision": 2,
+                    "live": true
+                },
+                "battery": {
+                    "name": "battery",
+                    "type": "uiVariable",
+                    "displayString": "Battery",
+                    "showActivity": true,
+                    "position": 56,
+                    "hidden": false,
+                    "units": "V",
+                    "varType": "float",
+                    "currentValue": "$tag.app().battery_voltage_v:number:null",
+                    "decPrecision": 2,
+                    "live": true
+                },
+                "solar_input": {
+                    "name": "solar_input",
+                    "type": "uiVariable",
+                    "displayString": "Solar Input",
+                    "showActivity": true,
+                    "position": 57,
+                    "hidden": false,
+                    "units": "W",
+                    "varType": "float",
+                    "currentValue": "$tag.app().charger_input_power_w:number:null",
+                    "decPrecision": 1,
+                    "live": true
+                },
+                "charging": {
+                    "name": "charging",
+                    "type": "uiVariable",
+                    "displayString": "Charging",
+                    "showActivity": true,
+                    "position": 58,
+                    "hidden": false,
+                    "varType": "bool",
+                    "currentValue": "$tag.app().charger_charging:boolean:false"
+                },
+                "no_elpro_radio_found_on_this_unit": {
+                    "name": "no_elpro_radio_found_on_this_unit",
+                    "type": "uiWarningIndicator",
+                    "displayString": "No ELPRO radio found on this unit",
+                    "position": 59,
+                    "hidden": "$tag.app().radio_missing_warning_hidden:boolean:true",
+                    "currentValue": "$cmds.app().no_elpro_radio_found_on_this_unit",
+                    "can_cancel": true
+                },
+                "radio_alarm__the_radio_module_is_reporting_a_fault": {
+                    "name": "radio_alarm__the_radio_module_is_reporting_a_fault",
+                    "type": "uiWarningIndicator",
+                    "displayString": "Radio alarm - the radio module is reporting a fault",
+                    "position": 60,
+                    "hidden": "$tag.app().radio_alarm_warning_hidden:boolean:true",
+                    "currentValue": "$cmds.app().radio_alarm__the_radio_module_is_reporting_a_fault",
+                    "can_cancel": true
+                },
+                "weak_radio_signal__check_antenna_feeder_and_alignment": {
+                    "name": "weak_radio_signal__check_antenna_feeder_and_alignment",
+                    "type": "uiWarningIndicator",
+                    "displayString": "Weak radio signal - check antenna, feeder and alignment",
+                    "position": 61,
+                    "hidden": "$tag.app().weak_signal_warning_hidden:boolean:true",
+                    "currentValue": "$cmds.app().weak_radio_signal__check_antenna_feeder_and_alignment",
+                    "can_cancel": true
+                },
+                "running_on_battery__no_supply_on_the_sup_terminals": {
+                    "name": "running_on_battery__no_supply_on_the_sup_terminals",
+                    "type": "uiWarningIndicator",
+                    "displayString": "Running on battery - no supply on the SUP terminals",
+                    "position": 62,
+                    "hidden": "$tag.app().battery_warning_hidden:boolean:true",
+                    "currentValue": "$cmds.app().running_on_battery__no_supply_on_the_sup_terminals",
+                    "can_cancel": true
+                },
+                "cannot_read_the_units_modbus_server__supply_and_battery_unknown": {
+                    "name": "cannot_read_the_units_modbus_server__supply_and_battery_unknown",
+                    "type": "uiWarningIndicator",
+                    "displayString": "Cannot read the unit's Modbus server - supply and battery unknown",
+                    "position": 63,
+                    "hidden": "$tag.app().rails_warning_hidden:boolean:true",
+                    "currentValue": "$cmds.app().cannot_read_the_units_modbus_server__supply_and_battery_unknown",
+                    "can_cancel": true
+                },
+                "radio": {
+                    "name": "radio",
+                    "type": "uiSubmodule",
+                    "displayString": "Radio",
+                    "showActivity": true,
+                    "position": 75,
+                    "hidden": false,
+                    "children": {
+                        "rssi_current": {
+                            "name": "rssi_current",
+                            "type": "uiVariable",
+                            "displayString": "RSSI (current)",
+                            "showActivity": true,
+                            "position": 64,
+                            "hidden": false,
+                            "units": "dBm",
+                            "varType": "float",
+                            "currentValue": "$tag.app().rssi_dbm:number:null",
+                            "decPrecision": 0,
+                            "live": true
+                        },
+                        "background_noise": {
+                            "name": "background_noise",
+                            "type": "uiVariable",
+                            "displayString": "Background Noise",
+                            "showActivity": true,
+                            "position": 65,
+                            "hidden": false,
+                            "units": "dBm",
+                            "varType": "float",
+                            "currentValue": "$tag.app().rssi_background_dbm:number:null",
+                            "decPrecision": 0,
+                            "live": true
+                        },
+                        "vswr": {
+                            "name": "vswr",
+                            "type": "uiVariable",
+                            "displayString": "VSWR",
+                            "showActivity": true,
+                            "position": 66,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().vswr:number:null",
+                            "decPrecision": 2
+                        },
+                        "pa_temperature": {
+                            "name": "pa_temperature",
+                            "type": "uiVariable",
+                            "displayString": "PA Temperature",
+                            "showActivity": true,
+                            "position": 67,
+                            "hidden": false,
+                            "units": "C",
+                            "varType": "float",
+                            "currentValue": "$tag.app().pa_temperature_c:number:null",
+                            "decPrecision": 0
+                        },
+                        "mesh_mode": {
+                            "name": "mesh_mode",
+                            "type": "uiVariable",
+                            "displayString": "Mesh Mode",
+                            "showActivity": true,
+                            "position": 68,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_mode:string:null"
+                        },
+                        "driver_state": {
+                            "name": "driver_state",
+                            "type": "uiVariable",
+                            "displayString": "Driver State",
+                            "showActivity": true,
+                            "position": 69,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_driver_state:string:null"
+                        },
+                        "radio_uptime": {
+                            "name": "radio_uptime",
+                            "type": "uiVariable",
+                            "displayString": "Radio Uptime",
+                            "showActivity": true,
+                            "position": 70,
+                            "hidden": false,
+                            "units": "s",
+                            "varType": "float",
+                            "currentValue": "$tag.app().radio_uptime_s:number:null",
+                            "decPrecision": 0
+                        },
+                        "last_reset": {
+                            "name": "last_reset",
+                            "type": "uiVariable",
+                            "displayString": "Last Reset",
+                            "showActivity": true,
+                            "position": 71,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_reset_type:string:null"
+                        },
+                        "last_error": {
+                            "name": "last_error",
+                            "type": "uiVariable",
+                            "displayString": "Last Error",
+                            "showActivity": true,
+                            "position": 72,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_last_error:string:null"
+                        },
+                        "transmitter_enabled": {
+                            "name": "transmitter_enabled",
+                            "type": "uiVariable",
+                            "displayString": "Transmitter Enabled",
+                            "showActivity": true,
+                            "position": 73,
+                            "hidden": false,
+                            "varType": "bool",
+                            "currentValue": "$tag.app().radio_tx_enabled:boolean:false"
+                        },
+                        "receiver_enabled": {
+                            "name": "receiver_enabled",
+                            "type": "uiVariable",
+                            "displayString": "Receiver Enabled",
+                            "showActivity": true,
+                            "position": 74,
+                            "hidden": false,
+                            "varType": "bool",
+                            "currentValue": "$tag.app().radio_rx_enabled:boolean:false"
+                        }
+                    }
+                },
+                "radio_configuration": {
+                    "name": "radio_configuration",
+                    "type": "uiSubmodule",
+                    "displayString": "Radio Configuration",
+                    "showActivity": true,
+                    "position": 86,
+                    "hidden": false,
+                    "children": {
+                        "transmit_frequency": {
+                            "name": "transmit_frequency",
+                            "type": "uiVariable",
+                            "displayString": "Transmit Frequency",
+                            "showActivity": true,
+                            "position": 76,
+                            "hidden": false,
+                            "units": "MHz",
+                            "varType": "float",
+                            "currentValue": "$tag.app().tx_frequency_mhz:number:null",
+                            "decPrecision": 4
+                        },
+                        "receive_frequency": {
+                            "name": "receive_frequency",
+                            "type": "uiVariable",
+                            "displayString": "Receive Frequency",
+                            "showActivity": true,
+                            "position": 77,
+                            "hidden": false,
+                            "units": "MHz",
+                            "varType": "float",
+                            "currentValue": "$tag.app().rx_frequency_mhz:number:null",
+                            "decPrecision": 4
+                        },
+                        "channel_bandwidth": {
+                            "name": "channel_bandwidth",
+                            "type": "uiVariable",
+                            "displayString": "Channel Bandwidth",
+                            "showActivity": true,
+                            "position": 78,
+                            "hidden": false,
+                            "units": "kHz",
+                            "varType": "float",
+                            "currentValue": "$tag.app().radio_bandwidth_khz:number:null",
+                            "decPrecision": 1
+                        },
+                        "transmit_power": {
+                            "name": "transmit_power",
+                            "type": "uiVariable",
+                            "displayString": "Transmit Power",
+                            "showActivity": true,
+                            "position": 79,
+                            "hidden": false,
+                            "units": "dBm",
+                            "varType": "float",
+                            "currentValue": "$tag.app().tx_power_dbm:number:null",
+                            "decPrecision": 0
+                        },
+                        "maximum_power": {
+                            "name": "maximum_power",
+                            "type": "uiVariable",
+                            "displayString": "Maximum Power",
+                            "showActivity": true,
+                            "position": 80,
+                            "hidden": false,
+                            "units": "dBm",
+                            "varType": "float",
+                            "currentValue": "$tag.app().tx_power_max_dbm:number:null",
+                            "decPrecision": 0
+                        },
+                        "antenna_gain": {
+                            "name": "antenna_gain",
+                            "type": "uiVariable",
+                            "displayString": "Antenna Gain",
+                            "showActivity": true,
+                            "position": 81,
+                            "hidden": false,
+                            "units": "dB",
+                            "varType": "float",
+                            "currentValue": "$tag.app().antenna_gain_db:number:null",
+                            "decPrecision": 1
+                        },
+                        "data_rate": {
+                            "name": "data_rate",
+                            "type": "uiVariable",
+                            "displayString": "Data Rate",
+                            "showActivity": true,
+                            "position": 82,
+                            "hidden": false,
+                            "units": "kbps",
+                            "varType": "float",
+                            "currentValue": "$tag.app().data_rate_kbps:number:null",
+                            "decPrecision": 3
+                        },
+                        "modulation": {
+                            "name": "modulation",
+                            "type": "uiVariable",
+                            "displayString": "Modulation",
+                            "showActivity": true,
+                            "position": 83,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_modulation:string:null"
+                        },
+                        "encoding": {
+                            "name": "encoding",
+                            "type": "uiVariable",
+                            "displayString": "Encoding",
+                            "showActivity": true,
+                            "position": 84,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_encoding:string:null"
+                        },
+                        "radio_address": {
+                            "name": "radio_address",
+                            "type": "uiVariable",
+                            "displayString": "Radio Address",
+                            "showActivity": true,
+                            "position": 85,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_address:string:null"
+                        }
+                    }
+                },
+                "radio_traffic": {
+                    "name": "radio_traffic",
+                    "type": "uiSubmodule",
+                    "displayString": "Radio Traffic",
+                    "showActivity": true,
+                    "position": 98,
+                    "hidden": false,
+                    "children": {
+                        "received_to_me": {
+                            "name": "received_to_me",
+                            "type": "uiVariable",
+                            "displayString": "Received (to me)",
+                            "showActivity": true,
+                            "position": 87,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().rx_unicast_to_me:number:null",
+                            "decPrecision": 0
+                        },
+                        "received_to_others": {
+                            "name": "received_to_others",
+                            "type": "uiVariable",
+                            "displayString": "Received (to others)",
+                            "showActivity": true,
+                            "position": 88,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().rx_unicast_to_other:number:null",
+                            "decPrecision": 0
+                        },
+                        "received_broadcast": {
+                            "name": "received_broadcast",
+                            "type": "uiVariable",
+                            "displayString": "Received (broadcast)",
+                            "showActivity": true,
+                            "position": 89,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().rx_multicast:number:null",
+                            "decPrecision": 0
+                        },
+                        "crc_errors": {
+                            "name": "crc_errors",
+                            "type": "uiVariable",
+                            "displayString": "CRC Errors",
+                            "showActivity": true,
+                            "position": 90,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().rx_crc_errors:number:null",
+                            "decPrecision": 0
+                        },
+                        "transmitted_ok": {
+                            "name": "transmitted_ok",
+                            "type": "uiVariable",
+                            "displayString": "Transmitted OK",
+                            "showActivity": true,
+                            "position": 91,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().tx_unicast_ok:number:null",
+                            "decPrecision": 0
+                        },
+                        "transmit_failures": {
+                            "name": "transmit_failures",
+                            "type": "uiVariable",
+                            "displayString": "Transmit Failures",
+                            "showActivity": true,
+                            "position": 92,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().tx_unicast_failed:number:null",
+                            "decPrecision": 0
+                        },
+                        "retries": {
+                            "name": "retries",
+                            "type": "uiVariable",
+                            "displayString": "Retries",
+                            "showActivity": true,
+                            "position": 93,
+                            "hidden": false,
+                            "varType": "float",
+                            "currentValue": "$tag.app().tx_retries:number:null",
+                            "decPrecision": 0
+                        },
+                        "retry_rate": {
+                            "name": "retry_rate",
+                            "type": "uiVariable",
+                            "displayString": "Retry Rate",
+                            "showActivity": true,
+                            "position": 94,
+                            "hidden": false,
+                            "units": "%",
+                            "varType": "float",
+                            "currentValue": "$tag.app().tx_retry_pct:number:null",
+                            "decPrecision": 1
+                        },
+                        "channel_busy_tx": {
+                            "name": "channel_busy_tx",
+                            "type": "uiVariable",
+                            "displayString": "Channel Busy (tx)",
+                            "showActivity": true,
+                            "position": 95,
+                            "hidden": false,
+                            "units": "%",
+                            "varType": "float",
+                            "currentValue": "$tag.app().util_tx_pct:number:null",
+                            "decPrecision": 2
+                        },
+                        "channel_busy_rx": {
+                            "name": "channel_busy_rx",
+                            "type": "uiVariable",
+                            "displayString": "Channel Busy (rx)",
+                            "showActivity": true,
+                            "position": 96,
+                            "hidden": false,
+                            "units": "%",
+                            "varType": "float",
+                            "currentValue": "$tag.app().util_rx_pct:number:null",
+                            "decPrecision": 2
+                        },
+                        "channel_errors": {
+                            "name": "channel_errors",
+                            "type": "uiVariable",
+                            "displayString": "Channel Errors",
+                            "showActivity": true,
+                            "position": 97,
+                            "hidden": false,
+                            "units": "%",
+                            "varType": "float",
+                            "currentValue": "$tag.app().util_error_pct:number:null",
+                            "decPrecision": 2
+                        }
+                    }
+                },
+                "power": {
+                    "name": "power",
+                    "type": "uiSubmodule",
+                    "displayString": "Power",
+                    "showActivity": true,
+                    "position": 104,
+                    "hidden": false,
+                    "children": {
+                        "running_from": {
+                            "name": "running_from",
+                            "type": "uiVariable",
+                            "displayString": "Running From",
+                            "showActivity": true,
+                            "position": 99,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().active_source:string:null"
+                        },
+                        "supply_current": {
+                            "name": "supply_current",
+                            "type": "uiVariable",
+                            "displayString": "Supply Current",
+                            "showActivity": true,
+                            "position": 100,
+                            "hidden": false,
+                            "units": "A",
+                            "varType": "float",
+                            "currentValue": "$tag.app().supply_current_a:number:null",
+                            "decPrecision": 3,
+                            "live": true
+                        },
+                        "supply_power": {
+                            "name": "supply_power",
+                            "type": "uiVariable",
+                            "displayString": "Supply Power",
+                            "showActivity": true,
+                            "position": 101,
+                            "hidden": false,
+                            "units": "W",
+                            "varType": "float",
+                            "currentValue": "$tag.app().supply_power_w:number:null",
+                            "decPrecision": 2,
+                            "live": true
+                        },
+                        "battery_current": {
+                            "name": "battery_current",
+                            "type": "uiVariable",
+                            "displayString": "Battery Current",
+                            "showActivity": true,
+                            "position": 102,
+                            "hidden": false,
+                            "units": "A",
+                            "varType": "float",
+                            "currentValue": "$tag.app().battery_current_a:number:null",
+                            "decPrecision": 3,
+                            "live": true
+                        },
+                        "battery_power": {
+                            "name": "battery_power",
+                            "type": "uiVariable",
+                            "displayString": "Battery Power",
+                            "showActivity": true,
+                            "position": 103,
+                            "hidden": false,
+                            "units": "W",
+                            "varType": "float",
+                            "currentValue": "$tag.app().battery_power_w:number:null",
+                            "decPrecision": 2,
+                            "live": true
+                        }
+                    }
+                },
+                "charger__mppt": {
+                    "name": "charger__mppt",
+                    "type": "uiSubmodule",
+                    "displayString": "Charger / MPPT",
+                    "showActivity": true,
+                    "position": 116,
+                    "hidden": false,
+                    "children": {
+                        "charger_status": {
+                            "name": "charger_status",
+                            "type": "uiVariable",
+                            "displayString": "Charger Status",
+                            "showActivity": true,
+                            "position": 105,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().charger_status:string:null"
+                        },
+                        "mppt_enabled": {
+                            "name": "mppt_enabled",
+                            "type": "uiVariable",
+                            "displayString": "MPPT Enabled",
+                            "showActivity": true,
+                            "position": 106,
+                            "hidden": false,
+                            "varType": "bool",
+                            "currentValue": "$tag.app().mppt_enabled:boolean:false"
+                        },
+                        "solar_panel_type": {
+                            "name": "solar_panel_type",
+                            "type": "uiVariable",
+                            "displayString": "Solar Panel Type",
+                            "showActivity": true,
+                            "position": 107,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().mppt_panel_type:string:null"
+                        },
+                        "input_connected": {
+                            "name": "input_connected",
+                            "type": "uiVariable",
+                            "displayString": "Input Connected",
+                            "showActivity": true,
+                            "position": 108,
+                            "hidden": false,
+                            "varType": "bool",
+                            "currentValue": "$tag.app().charger_input_present:boolean:false"
+                        },
+                        "battery_detected": {
+                            "name": "battery_detected",
+                            "type": "uiVariable",
+                            "displayString": "Battery Detected",
+                            "showActivity": true,
+                            "position": 109,
+                            "hidden": false,
+                            "varType": "bool",
+                            "currentValue": "$tag.app().charger_battery_detected:boolean:false"
+                        },
+                        "input_voltage": {
+                            "name": "input_voltage",
+                            "type": "uiVariable",
+                            "displayString": "Input Voltage",
+                            "showActivity": true,
+                            "position": 110,
+                            "hidden": false,
+                            "units": "V",
+                            "varType": "float",
+                            "currentValue": "$tag.app().charger_input_voltage_v:number:null",
+                            "decPrecision": 2,
+                            "live": true
+                        },
+                        "input_current": {
+                            "name": "input_current",
+                            "type": "uiVariable",
+                            "displayString": "Input Current",
+                            "showActivity": true,
+                            "position": 111,
+                            "hidden": false,
+                            "units": "A",
+                            "varType": "float",
+                            "currentValue": "$tag.app().charger_input_current_a:number:null",
+                            "decPrecision": 3,
+                            "live": true
+                        },
+                        "charge_voltage_setpoint": {
+                            "name": "charge_voltage_setpoint",
+                            "type": "uiVariable",
+                            "displayString": "Charge Voltage Setpoint",
+                            "showActivity": true,
+                            "position": 112,
+                            "hidden": false,
+                            "units": "V",
+                            "varType": "float",
+                            "currentValue": "$tag.app().charge_voltage_v:number:null",
+                            "decPrecision": 2
+                        },
+                        "max_charge_current": {
+                            "name": "max_charge_current",
+                            "type": "uiVariable",
+                            "displayString": "Max Charge Current",
+                            "showActivity": true,
+                            "position": 113,
+                            "hidden": false,
+                            "units": "A",
+                            "varType": "float",
+                            "currentValue": "$tag.app().max_charge_current_a:number:null",
+                            "decPrecision": 2
+                        },
+                        "input_current_limit": {
+                            "name": "input_current_limit",
+                            "type": "uiVariable",
+                            "displayString": "Input Current Limit",
+                            "showActivity": true,
+                            "position": 114,
+                            "hidden": false,
+                            "units": "A",
+                            "varType": "float",
+                            "currentValue": "$tag.app().input_current_limit_a:number:null",
+                            "decPrecision": 2
+                        },
+                        "reverse_mode": {
+                            "name": "reverse_mode",
+                            "type": "uiVariable",
+                            "displayString": "Reverse Mode",
+                            "showActivity": true,
+                            "position": 115,
+                            "hidden": false,
+                            "varType": "bool",
+                            "currentValue": "$tag.app().reverse_mode_enabled:boolean:false"
+                        }
+                    }
+                },
+                "unit": {
+                    "name": "unit",
+                    "type": "uiSubmodule",
+                    "displayString": "Unit",
+                    "showActivity": true,
+                    "position": 126,
+                    "hidden": false,
+                    "children": {
+                        "model": {
+                            "name": "model",
+                            "type": "uiVariable",
+                            "displayString": "Model",
+                            "showActivity": true,
+                            "position": 117,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().unit_model:string:null"
+                        },
+                        "product": {
+                            "name": "product",
+                            "type": "uiVariable",
+                            "displayString": "Product",
+                            "showActivity": true,
+                            "position": 118,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().unit_product:string:null"
+                        },
+                        "radio_type": {
+                            "name": "radio_type",
+                            "type": "uiVariable",
+                            "displayString": "Radio Type",
+                            "showActivity": true,
+                            "position": 119,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().unit_radio_type:string:null"
+                        },
+                        "serial_number": {
+                            "name": "serial_number",
+                            "type": "uiVariable",
+                            "displayString": "Serial Number",
+                            "showActivity": true,
+                            "position": 120,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().unit_serial:string:null"
+                        },
+                        "firmware": {
+                            "name": "firmware",
+                            "type": "uiVariable",
+                            "displayString": "Firmware",
+                            "showActivity": true,
+                            "position": 121,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().unit_firmware:string:null"
+                        },
+                        "radio_firmware": {
+                            "name": "radio_firmware",
+                            "type": "uiVariable",
+                            "displayString": "Radio Firmware",
+                            "showActivity": true,
+                            "position": 122,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_firmware:string:null"
+                        },
+                        "radio_hardware": {
+                            "name": "radio_hardware",
+                            "type": "uiVariable",
+                            "displayString": "Radio Hardware",
+                            "showActivity": true,
+                            "position": 123,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_hardware:string:null"
+                        },
+                        "radio_serial": {
+                            "name": "radio_serial",
+                            "type": "uiVariable",
+                            "displayString": "Radio Serial",
+                            "showActivity": true,
+                            "position": 124,
+                            "hidden": false,
+                            "varType": "string",
+                            "currentValue": "$tag.app().radio_serial:string:null"
+                        },
+                        "last_read": {
+                            "name": "last_read",
+                            "type": "uiTimestamp",
+                            "displayString": "Last Read",
+                            "showActivity": true,
+                            "position": 125,
+                            "hidden": false,
+                            "varType": "timestamp",
+                            "currentValue": "$tag.app().last_read:number:null"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

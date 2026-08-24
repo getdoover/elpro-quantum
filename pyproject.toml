@@ -1,0 +1,33 @@
+[project]
+name = "elpro_quantum_diagnostics"
+version = "0.1.0"
+description = "Diagnostics for an ELPRO Quantum: licensed-band radio health and signal, solar charger / MPPT state, and the unit's supply and battery rails."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydoover>=1.9.0",
+    "pymodbus==3.9.2",
+]
+
+[project.scripts]
+doover-app-run = "elpro_quantum_diagnostics:main"
+export-config = "elpro_quantum_diagnostics.app_config:export"
+export-ui = "elpro_quantum_diagnostics.app_ui:export"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/elpro_quantum_diagnostics"]
+
+[dependency-groups]
+dev = [
+    "grpcio>=1.71.0",
+    "protobuf>=6.30.2",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
