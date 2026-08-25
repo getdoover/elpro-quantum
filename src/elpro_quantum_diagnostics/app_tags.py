@@ -147,5 +147,4 @@ class QuantumDiagnosticsTags(Tags):
     radio_missing_warning_hidden = Boolean(default=True)
     radio_alarm_warning_hidden = Boolean(default=True)
     weak_signal_warning_hidden = Boolean(default=True)
-    battery_warning_hidden = Boolean(default=True)
     rails_warning_hidden = Boolean(default=True)

@@ -21,8 +21,11 @@ container, and never writes to the unit's configuration or its radio.
 | Unit | Model, product name, radio type, serial number, firmware, and the radio's own firmware/hardware/serial |
 
 Warnings are raised for: no radio found, radio alarm or a radio that never
-initialised, a weak signal (threshold configurable, default −100 dBm), the unit
-running on battery with no supply present, and an unreadable Modbus server.
+initialised, a weak signal (threshold configurable, default −100 dBm), and an
+unreadable Modbus server.
+
+Running on battery is **not** a warning — plenty of Quantums are meant to. Which
+rail is carrying the unit is reported as a value under Power instead.
 
 Rather more is published as tags than is shown on the dashboard — the per-source
 counters, the Linux driver's own transmit/receive statistics, the RSSI error

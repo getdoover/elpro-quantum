@@ -73,10 +73,6 @@ class QuantumDiagnosticsUI(ui.UI):
         "Weak radio signal - check antenna, feeder and alignment",
         hidden=Tags.weak_signal_warning_hidden,
     )
-    battery_warning = ui.WarningIndicator(
-        "Running on battery - no supply on the SUP terminals",
-        hidden=Tags.battery_warning_hidden,
-    )
     rails_warning = ui.WarningIndicator(
         "Cannot read the unit's Modbus server - supply and battery unknown",
         hidden=Tags.rails_warning_hidden,

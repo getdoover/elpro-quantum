@@ -313,8 +313,6 @@ class QuantumDiagnosticsApplication(Application):
             log.warning(f"Rail read failed: {e}")
             await self.tags.rails_available.set(False)
             await self.tags.rails_warning_hidden.set(False)
-            # The battery warning is about a rail reading we no longer have.
-            await self.tags.battery_warning_hidden.set(True)
             # Force a re-read of the identity when the link comes back, since
             # a server we lost may not be the same unit we reconnect to.
             self.modbus_identity_published = False
@@ -340,6 +338,7 @@ class QuantumDiagnosticsApplication(Application):
         await self.tags.battery_power_w.set(snapshot.battery_power_w)
         await self.tags.active_source.set(snapshot.active_source)
 
-        on_battery = snapshot.active_source == "battery"
-        await self.tags.running_on_battery.set(on_battery)
-        await self.tags.battery_warning_hidden.set(not on_battery)
+        # Published as a value, not a warning: plenty of Quantums are meant to
+        # run off their battery, so it says which rail is carrying the unit
+        # rather than implying something is wrong.
+        await self.tags.running_on_battery.set(snapshot.active_source == "battery")
