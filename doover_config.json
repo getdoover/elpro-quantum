@@ -1,5 +1,6 @@
 {
     "elpro_quantum_diagnostics": {
+        "icon_url": "https://cdn.jsdelivr.net/gh/getdoover/app-icons@f6ca20eca2c2d1e05184cb06bf6fee951bba40e7/icons/elpro.png",
         "name": "elpro_quantum_diagnostics",
         "display_name": "ELPRO Quantum Diagnostics",
         "type": "DEV",
